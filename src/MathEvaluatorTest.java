@@ -22,6 +22,15 @@ public class MathEvaluatorTest {
 		assertEquals(2.12345, new MathEvaluator().calculate("2.12345"));
 	}
 	
+	@Test
+	public void givenExpressionOfDouble_whenValueIncludesExponent_thenReturnsValueAsDouble() {
+		assertEquals(2.12E12, new MathEvaluator().calculate("2.12E12"));
+	}
+	
+	@Test
+	public void givenExpressionOfNumberPlusNumber_whenParsed_thenReturnsCalculatedExpression() {
+		assertEquals(3.0, new MathEvaluator().calculate("1+2"));
+	}
 
 	
 	// Original tests from CodeWars
