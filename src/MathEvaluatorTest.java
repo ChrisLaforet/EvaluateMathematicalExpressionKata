@@ -42,6 +42,16 @@ public class MathEvaluatorTest {
 		assertEquals(6.0, new MathEvaluator().calculate("1+2+3"));
 	}
 	
+	@Test
+	public void givenExpressionOfUnaryMinusAndNumber_whenParsed_thenReturnsNegativeNumber() {
+		assertEquals(-150.0, new MathEvaluator().calculate("-150"));
+	}
+	
+	@Test
+	public void givenExpressionOfOperationOnTwoUnaryMinusNumbers_whenParsed_thenReturnsCalculatedExpressionWithNegativeNumbers() {
+		assertEquals(-200.0, new MathEvaluator().calculate("-150+-50"));
+	}
+	
 	
 	// Original tests from CodeWars
 	@Test
@@ -64,11 +74,11 @@ public class MathEvaluatorTest {
 		assertEquals(new MathEvaluator().calculate("1 /1"), 1d, 0.01);
 	}
 
-//	@Test
-//	public void testNegative() {
-//		assertEquals(new MathEvaluator().calculate("-123"), -123d, 0.01);
-//	}
-//
+	@Test
+	public void testNegative() {
+		assertEquals(new MathEvaluator().calculate("-123"), -123d, 0.01);
+	}
+
 	@Test
 	public void testLiteral() {
 		assertEquals(new MathEvaluator().calculate("123"), 123d, 0.01);

@@ -23,8 +23,8 @@ public class MathEvaluator {
 	static class Value extends Expression {
 		private double value;
 
-		public Value(String value) {
-			this.value = Double.parseDouble(value);
+		public Value(String value, boolean negateValue) {
+			this.value = Double.parseDouble(value) * (negateValue ? -1.0 : 1.0);
 		}
 
 		@Override
@@ -271,6 +271,34 @@ public class MathEvaluator {
 			return null;
 		}
 		
+		private static Expression extractNumberOrExpression(Queue<Token> tokens) {
+			if (tokens.isEmpty()) {
+				return null;
+			}
+
+			boolean unaryMinus = false;
+			Token token = tokens.poll();
+			
+			if (token instanceof Operator) {
+				if (token.getToken().equals("-")) {
+					unaryMinus = true;
+					token = tokens.poll();
+				} else {
+					// definitely a syntax error!!
+					return null;
+				}
+			}
+			
+			if (token instanceof OpenParen) {
+				return extractExpressionFrom(tokens);
+			} else if (token instanceof Number) {
+				return new Value(token.getToken(), unaryMinus);
+			}
+			
+			// possible error?
+			return null;
+		}
+		
 		private static Expression extractOperatorExpression(Expression lhs, Queue<Token> tokens) {
 			OperationType operationType = null;
 			Token token = tokens.poll();
@@ -283,16 +311,7 @@ public class MathEvaluator {
 				return null;
 			}
 			
-			Expression rhs = null;
-			token = tokens.poll();
-			if (token == null) {
-				// error?
-				return null;
-			} else if (token instanceof Number) {
-				rhs = new Value(token.getToken());
-			} else if (token instanceof OpenParen) {
-				rhs = extractExpressionFrom(tokens);
-			}
+			Expression rhs = extractNumberOrExpression(tokens);
 			
 			return new Operation(lhs, rhs, operationType);
 		}
@@ -302,20 +321,7 @@ public class MathEvaluator {
 				return null;
 			}
 
-			Token token = tokens.poll();
-			Expression lhs = null;
-			
-			if (token instanceof OpenParen) {
-				lhs = extractExpressionFrom(tokens);
-			} else if (token instanceof Number) {
-				lhs = new Value(token.getToken());
-			} 
-			
-			if (lhs == null) {
-				// error?
-				return null;
-			}
-			
+			Expression lhs = extractNumberOrExpression(tokens);
 			Expression expression = lhs;
 			while (true) {
 				Expression operatorExpression = extractOperatorExpression(expression, tokens);
