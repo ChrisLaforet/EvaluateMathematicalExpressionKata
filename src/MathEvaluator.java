@@ -270,29 +270,10 @@ public class MathEvaluator {
 			// error?
 			return null;
 		}
-
-		private static Expression extractExpressionFrom(Queue<Token> tokens) {
-			if (tokens.isEmpty()) {
-				return null;
-			}
-
-			Token token = tokens.poll();
-			Expression lhs = null;
-
-			
-			if (token instanceof OpenParen) {
-				lhs = extractExpressionFrom(tokens);
-			} else if (token instanceof Number) {
-				lhs = new Value(token.getToken());
-			} 
-			
-			if (lhs == null) {
-				// error?
-				return null;
-			}
-			
+		
+		private static Expression extractOperatorExpression(Expression lhs, Queue<Token> tokens) {
 			OperationType operationType = null;
-			token = tokens.poll();
+			Token token = tokens.poll();
 			if (token == null) {
 				return lhs;
 			} else if (token instanceof Operator) {
@@ -313,8 +294,41 @@ public class MathEvaluator {
 				rhs = extractExpressionFrom(tokens);
 			}
 			
-
 			return new Operation(lhs, rhs, operationType);
+		}
+
+		private static Expression extractExpressionFrom(Queue<Token> tokens) {
+			if (tokens.isEmpty()) {
+				return null;
+			}
+
+			Token token = tokens.poll();
+			Expression lhs = null;
+			
+			if (token instanceof OpenParen) {
+				lhs = extractExpressionFrom(tokens);
+			} else if (token instanceof Number) {
+				lhs = new Value(token.getToken());
+			} 
+			
+			if (lhs == null) {
+				// error?
+				return null;
+			}
+			
+			Expression expression = lhs;
+			while (true) {
+				Expression operatorExpression = extractOperatorExpression(expression, tokens);
+				if (operatorExpression == null) {
+					break;
+				}
+				if (expression == operatorExpression) {
+					break;
+				}
+				expression = operatorExpression;
+			}
+
+			return expression;
 		}
 	}
 }

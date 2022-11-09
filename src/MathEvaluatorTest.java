@@ -36,6 +36,11 @@ public class MathEvaluatorTest {
 	public void givenExpressionOfParentheticalNumberPlusNumber_whenParsed_thenReturnsCalculatedExpression() {
 		assertEquals(3.0, new MathEvaluator().calculate("(1+2)"));
 	}
+
+	@Test
+	public void givenExpressionOfNumberPlusNumberPlusNumber_whenParsed_thenReturnsCalculatedExpression() {
+		assertEquals(6.0, new MathEvaluator().calculate("1+2+3"));
+	}
 	
 	
 	// Original tests from CodeWars
