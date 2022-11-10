@@ -48,15 +48,29 @@ public class MathEvaluatorTest {
 	}
 	
 	@Test
-	public void givenExpressionOfOperationOnTwoUnaryMinusNumbers_whenParsed_thenReturnsCalculatedExpressionWithNegativeNumbers() {
+	public void givenAddExpressionOfOperationOnTwoUnaryMinusNumbers_whenParsed_thenReturnsCalculatedExpressionWithNegativeNumbers() {
 		assertEquals(-200.0, new MathEvaluator().calculate("-150+-50"));
+	}
+	
+	@Test
+	public void givenSubtractExpressionOfOperationOnUnaryMinusNumbers_whenParsed_thenReturnsCalculatedExpressionWithNegativeNumbers() {
+		assertEquals(-100.0, new MathEvaluator().calculate("0-150--50"));
 	}
 	
 	@Test
 	public void givenExpressionOfPriorityOfOperation_whenParsed_thenReturnsCalculatedExpression() {
 		assertEquals(30.0, new MathEvaluator().calculate("10 + 4 * 5"));
 	}
+
+	@Test
+	public void givenExpressionOfParenthetizedNumber_whenParsed_thenReturnsCalculatedExpression() {
+		assertEquals(3.0, new MathEvaluator().calculate("(3)"));
+	}
 	
+	@Test
+	public void givenExpressionOfMultiplyParenthetizedNumber_whenParsed_thenReturnsCalculatedExpression() {
+		assertEquals(3.0, new MathEvaluator().calculate("((((3.0)))"));
+	}
 	
 	// Original tests from CodeWars
 	@Test
@@ -89,18 +103,18 @@ public class MathEvaluatorTest {
 		assertEquals(new MathEvaluator().calculate("123"), 123d, 0.01);
 	}
 
-//	@Test
-//	public void testExpression() {
-//		assertEquals(new MathEvaluator().calculate("2 /2+3 * 4.75- -6"), 21.25, 0.01);
-//	}
-//
+	@Test
+	public void testExpression() {
+		assertEquals(new MathEvaluator().calculate("2 /2+3 * 4.75- -6"), 21.25, 0.01);
+	}
+
 	@Test
 	public void testSimple() {
 		assertEquals(new MathEvaluator().calculate("12* 123"), 1476d, 0.01);
 	}
 
-//	@Test
-//	public void testComplex() {
-//		assertEquals(new MathEvaluator().calculate("2 / (2 + 3) * 4.33 - -6"), 7.732, 0.01);
-//	}
+	@Test
+	public void testComplex() {
+		assertEquals(new MathEvaluator().calculate("2 / (2 + 3) * 4.33 - -6"), 7.732, 0.01);
+	}
 }

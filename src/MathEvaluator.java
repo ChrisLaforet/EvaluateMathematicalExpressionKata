@@ -126,6 +126,14 @@ public class MathEvaluator {
 		public double evaluate() {
 			return optype.evaluate(lhs.evaluate(), rhs.evaluate());
 		}
+		
+		public Expression getRhs() {
+			return rhs;
+		}
+		
+		public Operation replaceRhs(Expression rhs) {
+			return new Operation(this.lhs, rhs, this.optype);
+		}
 	}
 
 	static abstract class Token {
@@ -267,8 +275,6 @@ public class MathEvaluator {
 
 	static class ExpressionParser {
 
-		// Note must handle unary minus
-
 		public static double parseAndEvaluate(String expressionString) {
 			final Expression expression = extractExpressionFrom(tokenize(expressionString));
 			return expression == null ? null : expression.evaluate();
@@ -332,19 +338,37 @@ public class MathEvaluator {
 				return lhs;
 			} else if (token instanceof Operator) {
 				operationType = getOperationType(token);
+			} else if (token instanceof CloseParen) {
+				return null;
 			} else {
 				// error?
 				return null;
 			}
 			
 			Expression rhs = extractNumberOrExpression(tokens);
-			Expression expression = new Operation(lhs, rhs, operationType);
+			if (rhs == null) {
+				// syntax error!
+				return null;
+			}
 
-			if (operationType.isMultiplier()) {
-				return new Value(expression.evaluate());
+
+			// priority of operations will be left-affined
+			if (!operationType.isMultiplier()) {
+				return new Operation(lhs, rhs, operationType);
 			}
 			
-			return expression;
+			if (lhs instanceof Value) {
+				return new Value(new Operation(lhs, rhs, operationType).evaluate());
+			} else if (lhs instanceof Operation) {
+				Operation left = (Operation)lhs;
+				return left.replaceRhs(new Value(new Operation(left.getRhs(), rhs, operationType).evaluate()));
+			}
+		
+//			lhs.
+			
+			
+			// error?
+			return null;
 		}
 
 		private static Expression extractExpressionFrom(Queue<Token> tokens) {
@@ -365,7 +389,7 @@ public class MathEvaluator {
 				expression = operatorExpression;
 			}
 
-			return expression;
+			return new Value(expression.evaluate());		// reduce parenthetical expressions or final expression
 		}
 	}
 }
