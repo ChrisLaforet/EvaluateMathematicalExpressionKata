@@ -72,6 +72,12 @@ public class MathEvaluatorTest {
 		assertEquals(3.0, new MathEvaluator().calculate("((((3.0)))"));
 	}
 	
+	@Test
+	public void givenExpressionWithUnaryMinusOnParenthetizedValue_whenParsed_thenReturnsCalculatedExpression() {
+		assertEquals(-7.0, new MathEvaluator().calculate("-(5 + 2)"));
+	}
+	
+	
 	// Original tests from CodeWars
 	@Test
 	public void testAddition() {

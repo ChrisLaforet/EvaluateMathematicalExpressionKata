@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -200,6 +199,12 @@ public class MathEvaluator {
 		public Token emitLast() {
 			return lastToken;
 		}
+		
+		private Token emit(Token token) {
+			lastToken = currentToken;
+			currentToken = token;
+			return currentToken;
+		}
 
 		public Token emitNext() {
 			while (offset < expression.length()) {
@@ -209,17 +214,14 @@ public class MathEvaluator {
 				}
 
 				if (Character.isDigit(ch)) {
-					Token token = emitNumber(ch);
-					lastToken = currentToken;
-					currentToken = token;
-					return currentToken;
+					return emit(emitNumber(ch));
 				} else if (isOperation(ch)) {
-					Token token = new Operator(Character.toString(ch));
-					lastToken = currentToken;
-					currentToken = token;
-					return currentToken;
+					return emit(new Operator(Character.toString(ch)));
+				} else if (ch == '(') {
+					return emit(new OpenParen());
+				} else if (ch == ')') {
+					return emit(new CloseParen());
 				}
-
 			}
 			return null;
 		}
@@ -322,7 +324,11 @@ public class MathEvaluator {
 			}
 			
 			if (token instanceof OpenParen) {
-				return extractExpressionFrom(tokens);
+				final Expression expression = extractExpressionFrom(tokens);
+				if (unaryMinus) {
+					return new Value(expression.evaluate() * -1.0);
+				}
+				return expression;
 			} else if (token instanceof Number) {
 				return new Value(token.getToken(), unaryMinus);
 			}
@@ -345,7 +351,16 @@ public class MathEvaluator {
 				return null;
 			}
 			
-			Expression rhs = extractNumberOrExpression(tokens);
+			Expression rhs = null;
+			if (tokens.isEmpty()) {
+				// syntax error
+				return null;
+			} else if (tokens.peek() instanceof OpenParen) {
+				tokens.poll();
+				rhs = extractExpressionFrom(tokens);
+			} else {
+				rhs = extractNumberOrExpression(tokens);
+			}
 			if (rhs == null) {
 				// syntax error!
 				return null;
@@ -364,8 +379,6 @@ public class MathEvaluator {
 				return left.replaceRhs(new Value(new Operation(left.getRhs(), rhs, operationType).evaluate()));
 			}
 		
-//			lhs.
-			
 			
 			// error?
 			return null;
