@@ -52,6 +52,11 @@ public class MathEvaluatorTest {
 		assertEquals(-200.0, new MathEvaluator().calculate("-150+-50"));
 	}
 	
+	@Test
+	public void givenExpressionOfPriorityOfOperation_whenParsed_thenReturnsCalculatedExpression() {
+		assertEquals(30.0, new MathEvaluator().calculate("10 + 4 * 5"));
+	}
+	
 	
 	// Original tests from CodeWars
 	@Test

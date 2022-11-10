@@ -18,6 +18,8 @@ public class MathEvaluator {
 		public abstract boolean matchesSymbol(String symbol);
 
 		public abstract double evaluate(double lhs, double rhs);
+		
+		public abstract boolean isMultiplier();
 	}
 
 	static class Value extends Expression {
@@ -25,6 +27,10 @@ public class MathEvaluator {
 
 		public Value(String value, boolean negateValue) {
 			this.value = Double.parseDouble(value) * (negateValue ? -1.0 : 1.0);
+		}
+		
+		public Value(double value) {
+			this.value = value;
 		}
 
 		@Override
@@ -44,6 +50,11 @@ public class MathEvaluator {
 		public double evaluate(double lhs, double rhs) {
 			return lhs * rhs;
 		}
+		
+		@Override
+		public boolean isMultiplier() {
+			return true;
+		}
 	}
 
 	static class Divider extends OperationType {
@@ -56,6 +67,11 @@ public class MathEvaluator {
 		@Override
 		public double evaluate(double lhs, double rhs) {
 			return lhs / rhs;
+		}
+		
+		@Override
+		public boolean isMultiplier() {
+			return true;
 		}
 	}
 
@@ -70,6 +86,11 @@ public class MathEvaluator {
 		public double evaluate(double lhs, double rhs) {
 			return lhs + rhs;
 		}
+		
+		@Override
+		public boolean isMultiplier() {
+			return false;
+		}
 	}
 
 	static class Subtractor extends OperationType {
@@ -82,6 +103,11 @@ public class MathEvaluator {
 		@Override
 		public double evaluate(double lhs, double rhs) {
 			return lhs - rhs;
+		}
+		
+		@Override
+		public boolean isMultiplier() {
+			return false;
 		}
 	}
 
@@ -312,8 +338,13 @@ public class MathEvaluator {
 			}
 			
 			Expression rhs = extractNumberOrExpression(tokens);
+			Expression expression = new Operation(lhs, rhs, operationType);
+
+			if (operationType.isMultiplier()) {
+				return new Value(expression.evaluate());
+			}
 			
-			return new Operation(lhs, rhs, operationType);
+			return expression;
 		}
 
 		private static Expression extractExpressionFrom(Queue<Token> tokens) {
